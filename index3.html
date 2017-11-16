@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>天气</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="http://g.tbcdn.cn/mtb/lib-flexible/0.3.4/??flexible_css.js,flexible.js" ;></script>
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/index.css">
+    <script src="https://cdn.bootcss.com/axios/0.17.1/axios.js"></script>
+</head>
+<body>
+<div class="page scroll" id="app">
+    <div v-html="html"></div>
+    <div class="head">
+        <h1 class="addr">{{ct}}市</h1>
+        <p class="weather">{{weather}}</p>
+        <p class="wendu">{{temp}}℃</p>
+    </div>
+    <div class="td_desc container clearfix">
+        <div class="fl">
+            <span class="xq">{{week}}</span>
+        </div>
+        <div class="fr">
+            <span class="gw">{{temperature.split('~')[0]}}</span>
+            <span class="dw">{{temperature.split('~')[1]}}</span>
+        </div>
+    </div>
+    <div class="feauther">
+        <ul class="container">
+            <li class="f_item" v-for="tq in feauther">
+                <span class="xq">{{tq.week}}</span>
+                <span class="yq">{{tq.weather}}</span>
+                <span class="gw">{{ tq.temperature.split('~')[0] }}</span>
+                <span class="dw">{{ tq.temperature.split('~')[1] }}</span>
+            </li>
+        </ul>
+    </div>
+    <div class="nav">
+        <ul>
+            <li>
+                <span class="menu">三</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="model none">
+    <div class="ct_item container">
+        <span class="ct">广州市</span>
+        <span class="fr wd">38℃</span>
+    </div>
+    <div class="ct_item container">
+        <span class="ct">昆明</span>
+        <span class="fr wd">18℃</span>
+    </div>
+    <div class="ad_ct_btn">+</div>
+</div>
+
+<div class="model search_model container" v-bind:class="{none:!show}" id="addr">
+    <div class="search_box none">
+        <p class="search_hint">请输入城市名</p>
+        <input type="text" class="search">
+        <a href="javascript:void(0);" class="quit_btn">取消</a>
+    </div>
+    <div class="ct_list_box">
+        <div class="ct_tit">当前城市</div>
+        <div class="ct_box">
+            <span class="ct">{{ct}}</span>
+        </div>
+    </div>
+    <div class="ct_list_box">
+        <div class="ct_tit">城市列表</div>
+        <div class="ct_box">
+            <span class="ct" v-for="ct in ctList" v-on:click="toggleCt(ct)">{{ct}}</span>
+        </div>
+    </div>
+</div>
+<script src="./js/jquery-3.2.1.js"></script>
+<script src="./js/vue.js"></script>
+<script>
+    var Bus = new Vue()
+
+    var app = new Vue({
+        el: "#app",
+        data: {
+            ct: "广州",
+            week: "星期一",
+            weather: "晴间多云",
+            temp: 18,
+            temperature: "3℃~5℃",
+            feauther: [
+                {
+                    "temperature": "9℃~18℃",
+                    "weather": "多云",
+                    "wind": "微风",
+                    "week": "星期一",
+                    "date": "20171030"
+                },
+                {
+                    "temperature": "10℃~19℃",
+                    "weather": "多云",
+                    "wind": "微风",
+                    "week": "星期二",
+                    "date": "20171031"
+                },
+                {
+                    "temperature": "10℃~20℃",
+                    "weather": "多云",
+                    "wind": "微风",
+                    "week": "星期三",
+                    "date": "20171101"
+                },
+                {
+                    "temperature": "10℃~18℃",
+                    "weather": "多云转小雨",
+                    "wind": "微风",
+                    "week": "星期四",
+                    "date": "20171102"
+                },
+                {
+                    "temperature": "8℃~15℃",
+                    "weather": "小雨",
+                    "wind": "微风",
+                    "week": "星期五",
+                    "date": "20171103"
+                },
+                {
+                    "temperature": "10℃~20℃",
+                    "weather": "多云",
+                    "wind": "微风",
+                    "week": "星期六",
+                    "date": "20171104"
+                },
+                {
+                    "temperature": "10℃~20℃",
+                    "weather": "多云",
+                    "wind": "微风",
+                    "week": "星期日",
+                    "date": "20171105"
+                }
+            ],
+            html: '<h1>hello</h1>'
+        },
+        watch: {
+            ct: function (val, oldVal) {
+                this.getTq();
+            },
+        },
+        created: function () {
+            this.getTq();
+            //es6
+            Bus.$on('eventName', value => {
+//                console.log('666');
+                this.ct = value;
+        })
+            //es5
+            /* Bus.$on('eventName',function (value) {
+             console.log('666');
+             }.bind(this))*/
+        },
+        methods: {
+            getTq: function () {
+//                console.log('123');
+                var that = this;
+//                axios.get('./json/guangzhou.json')
+                axios.get('http://v.juhe.cn/weather/index?cityname=' + this.ct + '&key=d2ff178db59fb9af648310524d053383')
+                        .then(function (response) {
+                            console.table(response);
+                            console.log('999999999', response.data);
+                            that.weather = response.data.result.today.weather;
+                            that.week = response.data.result.today.week;
+                            that.temp = response.data.result.sk.temp;
+                            that.temperature = response.data.result.today.temperature;
+                            that.feauther.length = 0;
+                            for (var i in  response.data.result.future) {
+                                that.feauther.push(response.data.result.future[i])
+                            }
+                            that.feauther.push()
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+            }
+        }
+    });
+
+    var addr = new Vue({
+        el: "#addr",
+        data: {
+            show: false,
+            ct: "广州",
+            ctList: ["北京", "上海", "广州", "深圳", "苏州", "杭州", "南京", "青岛", "大连", "成都"]
+        },
+        created: function () {
+//            console.log('测试一下吧')
+            var that = this;
+            axios.get('http://v.juhe.cn/weather/citys?key=d2ff178db59fb9af648310524d053383')
+                    .then(function (response) {
+                        console.table(response);
+                        console.log('666666', response.data);
+
+                        that.ctList.length = 0;
+                        for (var i in  response.data.result) {
+                            that.ctList.push(response.data.result[i].district)
+                        }
+                        that.ctList.push()
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+        },
+        methods: {
+            toggleCt: function (ct) {
+                /*console.log(ct);
+                 console.log('ctt');*/
+                this.ct = ct;
+                this.show = !this.show;
+                Bus.$emit('eventName', ct)
+
+            }
+        }
+    });
+
+    $(function () {
+
+        /*//点击下方菜单按钮，显示搜索框
+         $('.menu').on('click', function () {
+         console.log('1');
+         $('.search_model').fadeIn();
+         });*/
+
+        //点击搜索的取消 关闭弹框
+        $('.quit_btn').on('click', function () {
+            /*console.log('1');
+             $('.search_model').fadeOut();*/
+            addr.$data.show = !addr.$data.show;
+        });
+
+        //点击下方菜单按钮，显示搜索框
+        $('.menu').on('click', function () {
+            addr.$data.show = !addr.$data.show;
+//           console.log(addr.$data.show);
+        });
+
+    });
+</script>
+</body>
+</html>

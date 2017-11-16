@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>天气</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="http://g.tbcdn.cn/mtb/lib-flexible/0.3.4/??flexible_css.js,flexible.js" ;></script>
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+<body>
+<div class="page scroll" id="app">
+    <div v-html="html"></div>
+    <div class="head">
+        <h1 class="addr">{{ct}}市</h1>
+        <p class="tqms">{{tqms}}</p>
+        <p class="wendu">{{temp}}℃</p>
+    </div>
+    <div class="td_desc container clearfix">
+        <div class="fl">
+            <span class="xq">星期一</span>
+        </div>
+        <div class="fr">
+            <span class="gw">30</span>
+            <span class="dw">21</span>
+        </div>
+    </div>
+    <div class="feauther">
+        <ul class="container">
+            <li class="f_item" v-for="tq in feauther">
+                <span class="xq">{{tq.week}}</span>
+                <span class="yq">{{tq.weather}}</span>
+                <span class="gw">{{ tq.temperature.split('~')[0] }}</span>
+                <span class="dw">{{ tq.temperature.split('~')[1] }}</span>
+            </li>
+        </ul>
+    </div>
+    <div class="nav">
+        <ul>
+            <li>
+                <span class="menu">三</span>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="model none">
+    <div class="ct_item container">
+        <span class="ct">广州市</span>
+        <span class="fr wd">38℃</span>
+    </div>
+    <div class="ct_item container">
+        <span class="ct">昆明</span>
+        <span class="fr wd">18℃</span>
+    </div>
+    <div class="ad_ct_btn">+</div>
+</div>
+<div class="model search_model container " id="addr">
+    <div class="search_box ">
+        <p class="search_hint">请输入城市名</p>
+        <input type="text" class="search">
+        <a href="javascript:void(0);" class="quit_btn">取消</a>
+    </div>
+    <div class="ct_list_box">
+        <div class="ct_tit">当前城市</div>
+        <div class="ct_box">
+            <span class="ct">{{ct}}</span>
+        </div>
+    </div>
+    <div class="ct_list_box">
+        <div class="ct_tit">热门城市</div>
+        <div class="ct_box">
+            <span class="ct" v-for="ct in ctList" v-on:click="toggleCt(ct)">{{ct}}</span>
+        </div>
+    </div>
+</div>
+<script src="./js/jquery-3.2.1.js"></script>
+<script src="./js/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            ct: "广州",
+            tqms: "晴间多云",
+            temp: 18,
+            feauther: [
+                {
+                    "temperature": "9℃~18℃",
+                    "weather": "多云",
+                    "wind": "微风",
+                    "week": "星期一",
+                    "date": "20171030"
+                },
+                {
+                    "temperature": "10℃~19℃",
+                    "weather": "多云",
+                    "wind": "微风",
+                    "week": "星期二",
+                    "date": "20171031"
+                },
+                {
+                    "temperature": "10℃~20℃",
+                    "weather": "多云",
+                    "wind": "微风",
+                    "week": "星期三",
+                    "date": "20171101"
+                },
+                {
+                    "temperature": "10℃~18℃",
+                    "weather": "多云转小雨",
+                    "wind": "微风",
+                    "week": "星期四",
+                    "date": "20171102"
+                },
+                {
+                    "temperature": "8℃~15℃",
+                    "weather": "小雨",
+                    "wind": "微风",
+                    "week": "星期五",
+                    "date": "20171103"
+                },
+                {
+                    "temperature": "10℃~20℃",
+                    "weather": "多云",
+                    "wind": "微风",
+                    "week": "星期六",
+                    "date": "20171104"
+                },
+                {
+                    "temperature": "10℃~20℃",
+                    "weather": "多云",
+                    "wind": "微风",
+                    "week": "星期日",
+                    "date": "20171105"
+                }
+            ],
+            html: '<h1>hello</h1>'
+        },
+        watch:{
+            ct: function (val, oldVal) {
+                console.log('new: %s, old: %s', val, oldVal);
+            },
+        },
+        methods:{
+            getTq:function () {
+
+            }
+        }
+    });
+
+    window.onhashchange = function (i) {
+        var newCt = i.newURL.split('#')[1];
+        console.log(i.newURL.split('#')[1]);
+        app.$data.ct = newCt;
+    }
+
+    var addr = new Vue({
+        el:"#addr",
+        data:{
+            show:true,
+            ct:"广州",
+            ctList:["北京","上海","广州","深圳","苏州","杭州","南京","青岛","大连","成都"]
+        },
+        methods:{
+            toggleCt:function (ct) {
+                /*console.log(ct);
+                console.log('ctt');*/
+                location.hash = ct;
+                this.ct = ct
+            }
+        }
+    });
+
+    $(function () {
+
+        //点击下方菜单按钮，显示搜索框
+        $('.menu').on('click', function () {
+            console.log('1');
+            $('.search_model').fadeIn();
+        });
+
+        //点击搜索的取消 关闭弹框
+        $('.quit_btn').on('click', function () {
+            console.log('1');
+            $('.search_model').fadeOut();
+        })
+    });
+</script>
+</body>
+</html>
